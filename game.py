@@ -27,7 +27,7 @@ class TestInputScreen:
             self.label.draw()
 
 
-FPS = 60.0
+FPS = 120.0
 game_window = pyglet.window.Window(800, 600)
 font = pyglet.resource.add_font("assets/fonts/karmatic-arcade.ttf")
 batch = Batch()
@@ -46,7 +46,7 @@ def on_draw():
     if len(screens) > 0:
         cur_screen = screens[-1]
         cur_screen.render()
-        print(cur_screen.name)
+        #print(cur_screen.name)
 
     
 def update(dt: float):

@@ -1,12 +1,16 @@
 from pytmx import *
 from pytmx.util_pyglet import load_pyglet
+
 import pyglet
 from pyglet.gl import *
 from pyglet.window import key
 
+from camera import Camera
+
 # TODO:
 # Move all this crap into a Map Object and
 # refocus what LevelScreen should be
+
 
 class SafeSprite(pyglet.sprite.Sprite):
     def __init__(self, *args, **kwargs):
@@ -20,9 +24,8 @@ class SafeSprite(pyglet.sprite.Sprite):
 class LevelScreen:
 
     def __init__(self, path, batch):
-        self.name="level1"
+        self.name = "level1"
         self.batch = batch
-        #path = pyglet.resource.file("assets/tilesets/map1-2")
         self.tm = load_pyglet(path)
 
         self.width_in_tiles = self.tm.width
@@ -31,6 +34,8 @@ class LevelScreen:
         self.tile_height = self.tm.tileheight
         self.pixel_width = self.width_in_tiles * self.tm.tilewidth
         self.pixel_height = self.height_in_tiles * self.tm.tileheight
+        self.x = 0
+        self.y = 0
 
         # Map of tiles with properties that are active
         # ie, the top most non-empty non-decorative tile
@@ -39,9 +44,15 @@ class LevelScreen:
         self.batches = []
 
         self.generate_sprites()
+        self.camera = Camera(
+            x=self.x,
+            y=self.y,
+            tile_width=self.tile_width,
+            tile_height=self.tile_height,
+            width_in_tiles=self.width_in_tiles,
+            height_in_tiles=self.height_in_tiles
+        )
 
-        self.x = 0
-        self.y = 0
 
     def get_tile_at_position(self, x: int, y: int) -> dict:
         if x < 0 or x >= self.width_in_tiles:
@@ -54,8 +65,6 @@ class LevelScreen:
     def generate_sprites(self):
         tw = self.tm.tilewidth
         th = self.tm.tileheight
-        mw = self.tm.width
-        mh = self.tm.height
 
         for layer in self.tm.visible_layers:
             new_batch = pyglet.graphics.Batch()
@@ -63,7 +72,7 @@ class LevelScreen:
             if isinstance(layer, TiledTileLayer):
                 for tx, ty, img in layer.tiles():
                     adj_x = tx*tw
-                    adj_y = self.pixel_height - (ty * th)
+                    adj_y = self.pixel_height - ((ty+1) * th)
 
                     spr = SafeSprite(
                         img,
@@ -72,7 +81,6 @@ class LevelScreen:
                         y=adj_y
                     )
 
-                    print(f"Sprite ({adj_x}, {adj_y})")
                     self.sprites.append(spr)
                     self.effective_map[(tx, ty)] = layer.data[tx][ty]
             elif isinstance(layer, TiledObjectGroup):
@@ -80,25 +88,21 @@ class LevelScreen:
             elif isinstance(layer, TiledImageLayer):
                 pass
 
-
     def update(self, keys: dict, dt: float):
-        if keys[key.UP] and self.y < self.height_in_tiles - 1:
-            self.y += 1
-        elif keys[key.DOWN] and self.y > 0:
-            self.y -= 1
-        if keys[key.RIGHT] and self.x < self.width_in_tiles - 1:
-            self.x += 1
-        elif keys[key.LEFT] and self.x > 0:
-            self.x -= 1
+        if keys[key.UP]:
+            self.camera.move(0, 1)
+        elif keys[key.DOWN]:
+            self.camera.move(0, -1)
+        if keys[key.RIGHT]:
+            self.camera.move(1, 0)
+        elif keys[key.LEFT]:
+            self.camera.move(-1, 0)
+
+        self.camera.update(dt)
 
     def render(self):
 
         glLoadIdentity()
-        #gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE)
-        #gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE)
-        #gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
-        #gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
-
-        glTranslatef(self.x * self.tile_width*-1, self.pixel_height - self.y * self.tile_height, 0.0)
+        self.camera.render()
         for batch in self.batches:
             batch.draw()
