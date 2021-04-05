@@ -2,6 +2,7 @@ import pyglet
 from pyglet.window import key
 from pyglet.graphics import Batch
 from level_screen import LevelScreen
+from pyglet.gl import glLoadIdentity, glMatrixMode, GL_MODELVIEW
 
 class TestInputScreen:
 
@@ -41,7 +42,8 @@ screens = []
 @game_window.event
 def on_draw():
     game_window.clear()
-
+    glLoadIdentity()
+    glMatrixMode(GL_MODELVIEW)
     # TODO: Mark screens as being partially transparent
     if len(screens) > 0:
         cur_screen = screens[-1]
