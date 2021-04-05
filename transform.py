@@ -2,6 +2,7 @@ from math import sqrt
 from typing import Union
 from pyglet.gl import *
 
+
 class Transform:
 
     VELOCITY_FLOOR = 0.01
@@ -38,9 +39,12 @@ class Transform:
 
     def render(self):
         """ This doesn't really render exactly, it just performs a translation and scale. Not necessary for camera"""
-        #gl.glScalef(self.scale, self.scale, 1)
-        print(self.render_position)
-        gl.glTranslatef(self.render_position.x*16, self.render_position.y*16, 0)
+        inv_scale = 1/self.scale
+        gl.glScalef(self.scale, self.scale, 1)
+        gl.glTranslatef(self.render_position.x * 16 * inv_scale, self.render_position.y * inv_scale * 16, 0)
+
+    def is_moving(self):
+        return not self.render_position == self.position
 
 
 class Vector2:
@@ -59,7 +63,7 @@ class Vector2:
         # TODO: Make this right
         dx = other * self.x
         dy = other * self.y
-        return Vector2(dx,dy)
+        return Vector2(dx, dy)
 
     def __str__(self):
         return f"({self.x},{self.y})"

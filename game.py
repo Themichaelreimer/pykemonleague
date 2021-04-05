@@ -39,6 +39,7 @@ screens = []
 # Doesn't follow camera... Maybe use seperate batch?
 #test_label = pyglet.text.Label("Test string", x=100, y=100)
 
+
 @game_window.event
 def on_draw():
     game_window.clear()

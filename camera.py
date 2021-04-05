@@ -1,6 +1,6 @@
 from transform import *
 from pyglet.gl import glTranslatef
-
+from math import ceil
 
 class Camera:
 
@@ -19,6 +19,7 @@ class Camera:
                  width_in_tiles=1,
                  height_in_tiles=1,
                  ):
+
         self.transform = Transform()
         self.transform.setPos(x, y)
 
@@ -27,16 +28,20 @@ class Camera:
         self.width_in_tiles = width_in_tiles
         self.height_in_tiles = height_in_tiles
 
-        self.camera_width = 0
-        self.camera_height = 0
+        self.camera_width = ceil(800 / 16)
+        self.camera_height = ceil(600 / 16)
 
         Camera.this = self
 
     def move(self, dx: int, dy: int):
-        # TODO: Factor in camera width to force position such that the viewport is entirely inside the map
-        tpos = self.transform.position + Vector2(dx, dy)
-        if 0 <= tpos.x < self.width_in_tiles and 0 <= tpos.y < self.height_in_tiles:
-            self.transform.move(dx, dy)
+        new_x = self.transform.position.x + dx
+        new_y = self.transform.position.y + dy
+        if not 0 <= new_x < self.width_in_tiles - self.camera_width + 1:
+            return
+        if not 0 <= new_y < self.height_in_tiles - self.camera_height + 0.5:
+            return
+
+        self.transform.move(dx, dy)
 
     def get_pixel_width(self):
         return self.tile_width * self.width_in_tiles

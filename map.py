@@ -1,6 +1,7 @@
+from typing import Tuple
+
 from pytmx import *
 from pytmx.util_pyglet import load_pyglet
-
 import pyglet
 from pyglet.gl import glTexParameteri, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE
 
@@ -32,20 +33,19 @@ class Map:
         self.tile_height = self.tm.tileheight
         self.pixel_width = self.width_in_tiles * self.tm.tilewidth
         self.pixel_height = self.height_in_tiles * self.tm.tileheight
-        self.x = 0
-        self.y = 0
 
         # Map of tiles with properties that are active
         # ie, the top most non-empty non-decorative tile
         self.effective_map = {}
         self.map_objects = {}
+        self.events = {}
         self.sprites = []
         self.batches = []
 
         self.generate_sprites()
         self.camera = Camera(
-            x=self.x,
-            y=self.y,
+            x=0,
+            y=0,
             tile_width=self.tile_width,
             tile_height=self.tile_height,
             width_in_tiles=self.width_in_tiles,
@@ -63,6 +63,9 @@ class Map:
     def get_object_at_position(self, x: int, y: int):
         if (x, y) in self.map_objects:
             return self.map_objects[(x, y)]
+
+    def get_bounds(self) -> Tuple[int,int]:
+        return self.width_in_tiles, self.height_in_tiles
 
     def generate_sprites(self):
         tw = self.tm.tilewidth
