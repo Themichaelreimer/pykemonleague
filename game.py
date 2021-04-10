@@ -2,7 +2,7 @@ import pyglet
 from pyglet.window import key
 from pyglet.graphics import Batch
 from level_screen import LevelScreen
-from pyglet.gl import glLoadIdentity, glMatrixMode, GL_MODELVIEW
+from pyglet.gl import *
 
 class TestInputScreen:
 
@@ -36,6 +36,9 @@ keys = key.KeyStateHandler()
 game_window.push_handlers(keys)
 screens = []
 
+# Enables transparency on pngs
+glEnable(GL_BLEND)
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 # Doesn't follow camera... Maybe use seperate batch?
 #test_label = pyglet.text.Label("Test string", x=100, y=100)
 
@@ -45,11 +48,11 @@ def on_draw():
     game_window.clear()
     glLoadIdentity()
     glMatrixMode(GL_MODELVIEW)
+
     # TODO: Mark screens as being partially transparent
     if len(screens) > 0:
         cur_screen = screens[-1]
         cur_screen.render()
-        #print(cur_screen.name)
 
     
 def update(dt: float):

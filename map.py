@@ -7,18 +7,16 @@ from pyglet.gl import glTexParameteri, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_
 
 from camera import Camera
 
-# TODO:
-# Move all this crap into a Map Object and
-# refocus what LevelScreen should be
-
 
 class SafeSprite(pyglet.sprite.Sprite):
     def __init__(self, *args, **kwargs):
         super(SafeSprite, self).__init__(*args, **kwargs)
         glTexParameteri(self._texture.target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         glTexParameteri(self._texture.target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        #gl.glTexParameteri(self._texture.target, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
-        #gl.glTexParameteri(self._texture.target, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
+
+        # TODO: This should improve visual quality, but I dont notice a difference ATM
+        #glTexParameteri(self._texture.target, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
+        #glTexParameteri(self._texture.target, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
 
 
 class Map:
@@ -64,7 +62,7 @@ class Map:
         if (x, y) in self.map_objects:
             return self.map_objects[(x, y)]
 
-    def get_bounds(self) -> Tuple[int,int]:
+    def get_bounds(self) -> Tuple[int, int]:
         return self.width_in_tiles, self.height_in_tiles
 
     def generate_sprites(self):
@@ -97,6 +95,5 @@ class Map:
         pass
 
     def render(self):
-        #self.camera.render()
         for batch in self.batches:
             batch.draw()
