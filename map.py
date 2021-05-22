@@ -65,6 +65,13 @@ class Map:
     def get_bounds(self) -> Tuple[int, int]:
         return self.width_in_tiles, self.height_in_tiles
 
+    def in_rendering_range(self, x, y):
+        left = self.camera.transform.x
+        right = left + self.camera.width_in_tiles
+        bottom = self.camera.transform.y
+        top = bottom + self.camera.height_in_tiles
+        return left <= x <= right and bottom <= y <= top
+
     def generate_sprites(self):
         tw = self.tm.tilewidth
         th = self.tm.tileheight

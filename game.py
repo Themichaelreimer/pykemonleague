@@ -28,7 +28,7 @@ class TestInputScreen:
             self.label.draw()
 
 
-FPS = 120.0
+FPS = 60.0
 game_window = pyglet.window.Window(800, 600)
 font = pyglet.resource.add_font("assets/fonts/karmatic-arcade.ttf")
 batch = Batch()
@@ -39,8 +39,9 @@ screens = []
 # Enables transparency on pngs
 glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
 # Doesn't follow camera... Maybe use seperate batch?
-#test_label = pyglet.text.Label("Test string", x=100, y=100)
+# test_label = pyglet.text.Label("Test string", x=100, y=100)
 
 
 @game_window.event
@@ -48,6 +49,7 @@ def on_draw():
     game_window.clear()
     glLoadIdentity()
     glMatrixMode(GL_MODELVIEW)
+    glScalef(2.0, 2.0, 1.0)
 
     # TODO: Mark screens as being partially transparent
     if len(screens) > 0:
