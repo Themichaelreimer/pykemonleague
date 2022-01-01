@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 from pytmx import *
 from pytmx.util_pyglet import load_pyglet
@@ -35,22 +35,24 @@ class Map:
         # Map of tiles with properties that are active
         # ie, the top most non-empty non-decorative tile
         self.effective_map = {}
-        self.map_objects = {}
-        self.events = {}
         self.sprites = []
         self.batches = []
 
         self.generate_sprites()
-        self.camera = Camera(
-            x=0,
-            y=0,
-            tile_width=self.tile_width,
-            tile_height=self.tile_height,
-            width_in_tiles=self.width_in_tiles,
-            height_in_tiles=self.height_in_tiles
-        )
+
+    def __contains__(self, pos):
+        """ Returns whether the point is in the map """
+        #breakpoint()
+        if type(pos) in [tuple, list]:
+            x = pos[0]
+            y = pos[1]
+            return x >= 0 and y >= 0 and x < self.width_in_tiles and y < self.height_in_tiles
+        return False
 
     def get_tile_at_position(self, x: int, y: int) -> dict:
+        """
+            Returns a dict with the properties of the tile at (x, y) 
+        """
         if x < 0 or x >= self.width_in_tiles:
             raise Exception("Queried Tile out of bounds")
         if y < 0 or y >= self.height_in_tiles:
@@ -58,27 +60,23 @@ class Map:
         tid = self.effective_map[(x, y)]
         return self.tm.tile_properties[tid]
 
-    def get_object_at_position(self, x: int, y: int):
-        if (x, y) in self.map_objects:
-            return self.map_objects[(x, y)]
-
     def get_bounds(self) -> Tuple[int, int]:
+        """
+        Returns the map's (width, height) in tiles
+        """
         return self.width_in_tiles, self.height_in_tiles
 
-    def in_rendering_range(self, x, y):
-        left = self.camera.transform.x
-        right = left + self.camera.width_in_tiles
-        bottom = self.camera.transform.y
-        top = bottom + self.camera.height_in_tiles
-        return left <= x <= right and bottom <= y <= top
-
     def generate_sprites(self):
+        """ 
+        Generates the sprites used to render. Only for initialization.
+        """
         tw = self.tm.tilewidth
         th = self.tm.tileheight
 
         for layer in self.tm.visible_layers:
             new_batch = pyglet.graphics.Batch()
             self.batches.append(new_batch)
+
             if isinstance(layer, TiledTileLayer):
                 for tx, ty, img in layer.tiles():
                     adj_x = tx*tw
@@ -93,8 +91,10 @@ class Map:
 
                     self.sprites.append(spr)
                     self.effective_map[(tx, ty)] = layer.data[tx][ty]
+
             elif isinstance(layer, TiledObjectGroup):
                 pass
+
             elif isinstance(layer, TiledImageLayer):
                 pass
 

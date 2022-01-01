@@ -1,9 +1,8 @@
 from typing import Tuple
 
 import pyglet
-from pyglet.gl import *
+import pyglet.gl as gl
 from transform import *
-
 
 class Cursor:
 
@@ -32,4 +31,7 @@ class Cursor:
 
     def y(self):
         return self.transform.position.y
+
+    def is_moving(self):
+        return self.transform.is_moving()
 

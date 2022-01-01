@@ -1,12 +1,13 @@
 from math import sqrt
 from typing import Union
-from pyglet.gl import *
+import pyglet.gl as gl
 
+""" TODO: Move to utils """
 
 class Transform:
 
-    VELOCITY_FLOOR = 0.01
-    MIN_SPEED = 8
+    VELOCITY_FLOOR = 0.1
+    MIN_SPEED = 16
 
     def __init__(self):
         self.render_position = Vector2()  # Position to draw at; will move towards self.position automatically every frame
@@ -18,19 +19,25 @@ class Transform:
 
         dv = self.render_position - self.position
         dist2 = dv.length2()
+
         if dist2 < self.VELOCITY_FLOOR:
             self.render_position = self.position.copy()
+        
         else:
-            velocity = (dist2/2)
+            velocity = (dist2 / 2)
             if velocity < self.MIN_SPEED:
                 velocity = self.MIN_SPEED
             dp = velocity * dt
 
             # Move render_position towards position by dp units
-            self.render_position = self.render_position - dv*dp
+            self.render_position = self.render_position - dv * dp
 
     def move(self, dx:int, dy:int):
-        self.setPos(self.position.x+dx, self.position.y+dy)
+        """
+            Updates the theoretical position of the object.
+            The render position may need to catch up
+        """
+        self.setPos(self.position.x + dx, self.position.y + dy)
 
     def setPos(self, x: int, y: int, immediate=False):
         self.position = Vector2(x, y)
@@ -67,6 +74,9 @@ class Vector2:
 
     def __str__(self):
         return f"({self.x},{self.y})"
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
     def copy(self):
         return Vector2(self.x, self.y)
